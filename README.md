@@ -2,7 +2,7 @@
 
 Autofac is an [IoC container](http://martinfowler.com/articles/injection.html) for Microsoft .NET. It manages the dependencies between classes so that **applications stay easy to change as they grow** in size and complexity. This is achieved by treating regular .NET classes as *[components](https://autofac.readthedocs.io/en/latest/glossary.html)*.
 
-[![Build status](https://ci.appveyor.com/api/projects/status/1mhkjcqr1ug80lra/branch/develop?svg=true)](https://ci.appveyor.com/project/Autofac/autofac-extensions-dependencyinjection/branch/develop)
+[![Build status](https://ci.appveyor.com/api/projects/status/1mhkjcqr1ug80lra/branch/develop?svg=true)](https://ci.appveyor.com/project/Autofac/autofac-extensions-dependencyinjection/branch/develop) [![codecov](https://codecov.io/gh/Autofac/Autofac.Extensions.DependencyInjection/branch/develop/graph/badge.svg)](https://codecov.io/gh/Autofac/Autofac.Extensions.DependencyInjection)
 
 Please file issues and pull requests for this package in this repository rather than in the Autofac core repo.
 
@@ -16,7 +16,7 @@ Please file issues and pull requests for this package in this repository rather 
 This quick start shows how to use the `IServiceProviderFactory{T}` integration that ASP.NET Core supports to help automatically build the root service provider for you. If you want more manual control, [check out the documentation for examples](https://autofac.readthedocs.io/en/latest/integration/aspnetcore.html).
 
 - Reference the `Autofac.Extensions.DependencyInjection` package from NuGet.
-- In your `Program.Main` method, where you configure the `WebHostBuilder`, call `AddAutofac` to hook Autofac into the startup pipeline.
+- In your `Program.Main` method, where you configure the `HostBuilder`, call `UseAutofac` to hook Autofac into the startup pipeline.
 - In the `ConfigureServices` method of your `Startup` class register things into the `IServiceCollection` using extension methods provided by other libraries.
 - In the `ConfigureContainer` method of your `Startup` class register things directly into an Autofac `ContainerBuilder`.
 
@@ -26,26 +26,28 @@ The `IServiceProvider` will automatically be created for you, so there's nothing
 ```C#
 public class Program
 {
-  public static void Main(string[] args)
+  public static async Task Main(string[] args)
   {
-    // The ConfigureServices call here allows for
+    // The service provider factory used here allows for
     // ConfigureContainer to be supported in Startup with
     // a strongly-typed ContainerBuilder.
-    var host = new WebHostBuilder()
-        .UseKestrel()
-        .ConfigureServices(services => services.AddAutofac())
-        .UseContentRoot(Directory.GetCurrentDirectory())
-        .UseIISIntegration()
-        .UseStartup<Startup>()
-        .Build();
+    var host = Host.CreateDefaultBuilder(args)
+      .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+      .ConfigureWebHostDefaults(webHostBuilder => {
+        webHostBuilder
+          .UseContentRoot(Directory.GetCurrentDirectory())
+          .UseIISIntegration()
+          .UseStartup<Startup>()
+      })
+      .Build();
 
-    host.Run();
+    await host.RunAsync();
   }
 }
 
 public class Startup
 {
-  public Startup(IHostingEnvironment env)
+  public Startup(IWebHostEnvironment env)
   {
     var builder = new ConfigurationBuilder()
         .SetBasePath(env.ContentRootPath)
@@ -55,7 +57,7 @@ public class Startup
     this.Configuration = builder.Build();
   }
 
-  public IConfigurationRoot Configuration { get; private set; }
+  public IConfiguration Configuration { get; private set; }
 
   // ConfigureServices is where you register dependencies. This gets
   // called by the runtime before the ConfigureContainer method, below.
@@ -64,7 +66,7 @@ public class Startup
     // Add services to the collection. Don't build or return
     // any IServiceProvider or the ConfigureContainer method
     // won't get called.
-    services.AddMvc();
+    services.AddOptions();
   }
 
   // ConfigureContainer is where you can register things directly

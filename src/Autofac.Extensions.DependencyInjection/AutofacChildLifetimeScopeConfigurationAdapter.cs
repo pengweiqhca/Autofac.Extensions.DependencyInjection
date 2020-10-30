@@ -1,5 +1,5 @@
 ﻿// This software is part of the Autofac IoC container
-// Copyright © 2017 Autofac Contributors
+// Copyright © 2019 Autofac Contributors
 // https://autofac.org
 //
 // Permission is hereby granted, free of charge, to any person
@@ -24,25 +24,32 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 namespace Autofac.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Extension methods on <see cref="IServiceCollection"/> to register the <see cref="IServiceProviderFactory{TContainerBuilder}"/>.
+    /// Configuration adapter for <see cref="AutofacChildLifetimeScopeServiceProviderFactory" />.
     /// </summary>
-    public static class ServiceCollectionExtensions
+    public class AutofacChildLifetimeScopeConfigurationAdapter
     {
+        private readonly List<Action<ContainerBuilder>> _configurationActions = new List<Action<ContainerBuilder>>();
+
         /// <summary>
-        /// Adds the <see cref="AutofacServiceProviderFactory"/> to the service collection. ONLY FOR PRE-ASP.NET 3.0 HOSTING. THIS WON'T WORK
-        /// FOR ASP.NET CORE 3.0+ OR GENERIC HOSTING.
+        /// Adds a configuration action that will be executed when the child <see cref="ILifetimeScope"/> is created.
         /// </summary>
-        /// <param name="services">The service collection to add the factory to.</param>
         /// <param name="configurationAction">Action on a <see cref="ContainerBuilder"/> that adds component registrations to the container.</param>
-        /// <returns>The service collection.</returns>
-        public static IServiceCollection AddAutofac(this IServiceCollection services, Action<ContainerBuilder> configurationAction = null)
+        /// <exception cref="ArgumentNullException">Throws when the passed configuration-action is null.</exception>
+        public void Add(Action<ContainerBuilder> configurationAction)
         {
-            return services.AddSingleton<IServiceProviderFactory<ContainerBuilder>>(new AutofacServiceProviderFactory(configurationAction));
+            if (configurationAction == null) throw new ArgumentNullException(nameof(configurationAction));
+
+            _configurationActions.Add(configurationAction);
         }
+
+        /// <summary>
+        /// Gets the list of configuration actions to be executed on the <see cref="ContainerBuilder"/> for the child <see cref="ILifetimeScope"/>.
+        /// </summary>
+        public IReadOnlyList<Action<ContainerBuilder>> ConfigurationActions => _configurationActions;
     }
 }

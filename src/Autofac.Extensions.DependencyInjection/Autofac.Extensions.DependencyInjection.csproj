@@ -2,20 +2,20 @@
 
   <PropertyGroup>
     <Description>Autofac implementation of the interfaces in Microsoft.Extensions.DependencyInjection.Abstractions, the .NET Framework dependency injection abstraction.</Description>
-    <VersionPrefix>4.4.0</VersionPrefix>
-    <TargetFrameworks>netstandard1.1;netstandard2.0</TargetFrameworks>
+    <!-- Set by AppVeyor -->
+    <VersionPrefix>0.0.1</VersionPrefix>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Autofac.Extensions.DependencyInjection</AssemblyName>
     <AssemblyOriginatorKeyFile>../../Autofac.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Autofac.Extensions.DependencyInjection</PackageId>
+    <PackageIcon>icon.png</PackageIcon>
     <PackageTags>autofac;di;ioc;dependencyinjection;aspnet;aspnetcore</PackageTags>
     <PackageReleaseNotes>Release notes are at https://github.com/autofac/Autofac.Extensions.DependencyInjection/releases</PackageReleaseNotes>
-    <PackageIconUrl>https://cloud.githubusercontent.com/assets/1156571/13684110/16b8f152-e6bf-11e5-84ae-22c66c6d351a.png</PackageIconUrl>
     <PackageProjectUrl>https://autofac.org</PackageProjectUrl>
-    <PackageLicenseUrl>https://opensource.org/licenses/mit-license.php</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/autofac/Autofac.Extensions.DependencyInjection</RepositoryUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -33,27 +33,45 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.9.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.6.1">
+    <None Include="..\..\build\icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.0" Condition="$(TargetFramework) == 'netstandard1.1'" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.0" Condition="$(TargetFramework) == 'netstandard2.0'" />
-    <PackageReference Include="Microsoft.Net.RoslynDiagnostics" Version="2.6.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-62925-02" Condition="Exists('$(MSBuildThisFileDirectory)../../.git')">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" Condition="Exists('$(MSBuildThisFileDirectory)../../.git')">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta007">
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ServiceProviderExtensionsResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ServiceProviderExtensionsResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="ServiceProviderExtensionsResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ServiceProviderExtensionsResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

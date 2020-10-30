@@ -84,6 +84,11 @@ _TeamCity*
 # DotCover is a Code Coverage Tool
 *.dotCover
 
+# Coverage
+coverage.*
+codecov.sh
+coverage/
+
 # NCrunch
 *.ncrunch*
 .*crunch*.local.xml
@@ -165,3 +170,6 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+
+# JetBrains Rider crap
+.idea
